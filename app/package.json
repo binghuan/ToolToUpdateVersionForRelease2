@@ -3,7 +3,7 @@
     "productName": "My Browser",
     "description": "An Experimental Peer-to-Peer Web Browser.",
     "homepage": "https://beakerbrowser.com/",
-    "version": "0.0.51",
+    "version": "0.0.52",
     "author": "Paul Frazee <pfrazee@gmail.com>",
     "copyright": "© 2020, Studio Bing-Huan",
     "main": "background-process.build.js",
