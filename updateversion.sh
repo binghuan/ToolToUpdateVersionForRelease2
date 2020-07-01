@@ -16,9 +16,9 @@ echo "${versionString}"
 
 ## Get version string.
 originalVersion=$(cat ${pacakgeFile} | grep -i -E "version" | sed 's/\"version\": \"//g' | sed 's/\",//g' | sed -e 's/^ *//' -e 's/ *$//' -e 's/^"//' -e 's/"$//')
-echo "---------------------"
+echo "-----------------------------"
 echo "version: _${originalVersion}_"
-echo "---------------------"
+echo "-----------------------------"
 
 ## extract version number.
 major=$(echo ${originalVersion} | cut -d "." -f 1)
@@ -37,7 +37,7 @@ echo "OK> Version has been updated."
 
 function commitWithTag() {
     echo "[START]-------------------------------------------------------------->"
-    date 
+    date
     echo ""
     buildStage=$1
     echo "commitWithTag for build stage ${buildStage}"
@@ -78,7 +78,7 @@ function commitWithTag() {
     targetReleaseNumber=$(($totalReleaseNumber + 1))
     tagForBuildStage="${buildStage}_${YYYYMMDD}_${targetReleaseNumber}"
     echo "New Tag = ${tagForBuildStage}"
-    git tag -a ${tagForBuildStage} -m "Add tag to release ${newVersion}"
+    git tag -a ${tagForBuildStage} -m "Version ${newVersion}"
     git push --tags
     echo "[END]----------------------------------------------------------------<\n"
 }
