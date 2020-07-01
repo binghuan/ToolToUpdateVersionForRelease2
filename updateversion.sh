@@ -10,8 +10,23 @@
 
 pacakgeFile="app/package.json"
 configFile="resources/mac/config.json"
+
+function checkFileExist() {
+    targetFile=$1
+    if [ -f "${targetFile}" ]; then
+        echo "OK> File ${targetFile} was found."
+    else
+        echo "NG> File ${targetFile} was not found."
+        exit 2
+    fi
+}
+
+checkFileExist ${pacakgeFile}
+checkFileExist ${configFile}
+
+## ---------------------------------------------------------------------------->
 versionString=$(cat ${pacakgeFile} | grep -i -E "version")
-echo "Check current version in file ${pacakgeFile}"
+echo "-> Check current version in file ${pacakgeFile}"
 echo "${versionString}"
 
 ## Get version string.
@@ -27,38 +42,39 @@ revision=$(echo ${originalVersion} | cut -d "." -f 3)
 
 newRevision=$(($revision + 1))
 
-echo "update revision from ${revision} to ${newRevision}"
+echo "Update revision from ${revision} to ${newRevision}"
 newVersion="${major}.${minor}.${newRevision}${deployEnv}"
 
-echo "... replace Version from ${originalVersion} to ${newVersion}"
+echo "Replace Version from ${originalVersion} to ${newVersion}"
 sed "s/\"version\": \"${originalVersion}\",/\"version\": \"${newVersion}\",/g" ${pacakgeFile} >tmp.json
 mv -f tmp.json ${pacakgeFile}
 echo "OK> Version has been updated."
+## ----------------------------------------------------------------------------<
 
 function commitWithTag() {
     echo "[START]-------------------------------------------------------------->"
     date
     echo ""
     buildStage=$1
-    echo "commitWithTag for build stage ${buildStage}"
+    echo "Commit with Tag for build stage ${buildStage}"
     shortName=""
     case "$buildStage" in
     "SIT")
-        echo "build stage is SIT"
+        echo "Build stage is SIT"
         shortName="s"
         ;;
     "PRO")
-        echo "build stage is PRODUCTION"
+        echo "Build stage is PRODUCTION"
         shortName="p"
         ;;
     "DEV")
-        echo "build stage is DEV"
+        echo "Build stage is DEV"
         shortName="d"
         ;;
     *)
-        echo "build stage is UNKNOWN"
+        echo "Build stage is UNKNOWN"
         shortName=""
-        exit 2
+        exit 3
         ;;
     esac
 
@@ -69,8 +85,7 @@ function commitWithTag() {
     git commit -m "Update version to release ${newVersion}"
     git push
 
-    echo ">> tagForBuildStage: "
-    echo "Ready to release new version for build stage ${buildStage}"
+    echo "-> Ready to release new version for build stage ${buildStage}"
     YYYYMMDD=$(date +"%Y%m%d")
     tagForBuildStage="${buildStage}_${YYYYMMDD}_"
     echo "${tagForBuildStage}"
