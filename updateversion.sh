@@ -8,6 +8,8 @@
 #     exit 1
 # fi
 
+git pull
+
 pacakgeFile="app/package.json"
 configFile="resources/mac/config.json"
 
