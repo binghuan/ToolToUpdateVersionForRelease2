@@ -96,7 +96,7 @@ function commitWithTag() {
     tagForBuildStage="${buildStage}_${YYYYMMDD}_${targetReleaseNumber}"
     echo "New Tag = ${tagForBuildStage}"
     git tag -a ${tagForBuildStage} -m "Version ${newVersion}"
-    git push --tags
+    git push origin ${tagForBuildStage}
     echo "[END]----------------------------------------------------------------<\n"
 }
 
