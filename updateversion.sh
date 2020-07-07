@@ -26,33 +26,6 @@ function checkFileExist() {
 checkFileExist ${pacakgeFile}
 checkFileExist ${configFile}
 
-## ---------------------------------------------------------------------------->
-versionString=$(cat ${pacakgeFile} | grep -i -E "version")
-echo "-> Check current version in file ${pacakgeFile}"
-echo "${versionString}"
-
-## Get version string.
-originalVersion=$(cat ${pacakgeFile} | grep -i -E "version" | sed 's/\"version\": \"//g' | sed 's/\",//g' | sed -e 's/^ *//' -e 's/ *$//' -e 's/^"//' -e 's/"$//')
-echo "-----------------------------"
-echo "version: _${originalVersion}_"
-echo "-----------------------------"
-
-## extract version number.
-major=$(echo ${originalVersion} | cut -d "." -f 1)
-minor=$(echo ${originalVersion} | cut -d "." -f 2)
-revision=$(echo ${originalVersion} | cut -d "." -f 3)
-
-newRevision=$(($revision + 1))
-
-echo "Update revision from ${revision} to ${newRevision}"
-newVersion="${major}.${minor}.${newRevision}${deployEnv}"
-
-echo "Replace Version from ${originalVersion} to ${newVersion}"
-sed "s/\"version\": \"${originalVersion}\",/\"version\": \"${newVersion}\",/g" ${pacakgeFile} >tmp.json
-mv -f tmp.json ${pacakgeFile}
-echo "OK> Version has been updated."
-## ----------------------------------------------------------------------------<
-
 function commitWithTag() {
     echo "[START]-------------------------------------------------------------->"
     date
@@ -100,5 +73,43 @@ function commitWithTag() {
     echo "[END]----------------------------------------------------------------<\n"
 }
 
-commitWithTag SIT
-commitWithTag PRO
+function updateVersion() {
+    ## ---------------------------------------------------------------------------->
+    versionString=$(cat ${pacakgeFile} | grep -i -E "version")
+    echo "-> Check current version in file ${pacakgeFile}"
+    echo "${versionString}"
+
+    ## Get version string.
+    originalVersion=$(cat ${pacakgeFile} | grep -i -E "version" | sed 's/\"version\": \"//g' | sed 's/\",//g' | sed -e 's/^ *//' -e 's/ *$//' -e 's/^"//' -e 's/"$//')
+    echo "-----------------------------"
+    echo "version: _${originalVersion}_"
+    echo "-----------------------------"
+
+    ## extract version number.
+    major=$(echo ${originalVersion} | cut -d "." -f 1)
+    minor=$(echo ${originalVersion} | cut -d "." -f 2)
+    revision=$(echo ${originalVersion} | cut -d "." -f 3)
+
+    newRevision=$(($revision + 1))
+
+    echo "Update revision from ${revision} to ${newRevision}"
+    newVersion="${major}.${minor}.${newRevision}${deployEnv}"
+
+    echo "Replace Version from ${originalVersion} to ${newVersion}"
+    sed "s/\"version\": \"${originalVersion}\",/\"version\": \"${newVersion}\",/g" ${pacakgeFile} >tmp.json
+    mv -f tmp.json ${pacakgeFile}
+    echo "OK> Version has been updated."
+    ## ----------------------------------------------------------------------------<
+
+    if [ $((newRevision % 2)) -eq 0 ]; then
+        echo "Number is even."
+        commitWithTag PRO
+
+    else
+        echo "Number is odd."
+        commitWithTag SIT
+    fi
+}
+
+updateVersion
+updateVersion
